@@ -18,16 +18,7 @@ self_employed = st.selectbox("Self Employed", ["No", "Yes"])
 income_annum = st.number_input("Annual Income (₹)", min_value=0)
 loan_amount = st.number_input("Loan Amount (₹)", min_value=0)
 loan_term = st.number_input("Loan Term (in years)", min_value=0, max_value=20)
-cibil_score = st.number_input("CIBIL Score", min_value=300, max_value=900)  
-
-# CIBIL Score Guidance — yahan se
-if cibil_score < 500:
-    st.warning("Poor CIBIL Score — Low approval chances")
-elif cibil_score < 700:
-    st.info("Average CIBIL Score — Moderate approval chances")
-else:
-    st.success("Good CIBIL Score — High approval chances")
-  
+cibil_score = st.number_input("CIBIL Score", min_value=300, max_value=900)   
 residential_assets_value = st.number_input("Residential Assets Value (₹)", min_value=0)
 commercial_assets_value = st.number_input("Commercial Assets Value (₹)", min_value=0)
 luxury_assets_value = st.number_input("Luxury Assets Value (₹)", min_value=0)
@@ -48,7 +39,18 @@ input_scaled = scaler.transform(input_data)
 
 if st.button("Predict"):
     prediction = model.predict(input_scaled)[0]
+    confidence = round(max(model.predict_proba(input_scaled)[0] * 100, 2))
+
     if prediction == 0:
-        st.success("Loan Approved")
+        st.success(f"Loan Approved - {confidence}% confidence")
     else:
-        st.error("Loan Rejected")
+        st.error(f"Loan Rejected - {confidence}% confidence")
+
+    # CIBIL Guidance
+    st.divider()
+    if cibil_score < 500: 
+        st.warning("Poor CIBIL Score - Low approval chances")
+    elif cibil_score < 700:
+        st.info("Average CIBIL Score - Moderate approval chances")
+    else: 
+        st.success("Good CIBIL Score - High approval chances")
