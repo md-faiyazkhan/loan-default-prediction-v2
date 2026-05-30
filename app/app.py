@@ -3,6 +3,9 @@ import numpy as np
 import joblib
 import os
 
+# Page Configuration 
+st.set_page_config(page_title="Loan Approval Prediction", page_icon="🏦")
+
 # Loading Model + Scaler Safely 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
