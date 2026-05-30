@@ -40,6 +40,7 @@ input_data = np.array([[
 
 input_scaled = scaler.transform(input_data)
 
+# Prediction
 if st.button("Predict"):
     prediction = model.predict(input_scaled)[0]
     confidence = round(float(max(model.predict_proba(input_scaled)[0]) * 100), 2)
@@ -57,3 +58,16 @@ if st.button("Predict"):
         st.info("Average CIBIL Score - Moderate approval chances")
     else: 
         st.success("Good CIBIL Score - High approval chances")
+
+
+# EMI Calculator
+st.divider()
+st.subheader("EMI Calculator")
+
+emi_rate = st.number_input("Annual Interest Rate (%)", min_value=0.0, max_value=30.0, value=8.5)
+
+if loan_amount > 0 and loan_term > 0 and emi_rate > 0:
+    r = (emi_rate / 100) / 12          # monthly interest rate
+    n = loan_term * 12                  # total months
+    emi = loan_amount * r * (1 + r)**n / ((1 + r)**n - 1)
+    st.success(f"Monthly EMI: ₹{emi:,.2f}")
