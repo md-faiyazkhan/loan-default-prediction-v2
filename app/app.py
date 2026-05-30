@@ -39,7 +39,7 @@ input_scaled = scaler.transform(input_data)
 
 if st.button("Predict"):
     prediction = model.predict(input_scaled)[0]
-    confidence = round(max(model.predict_proba(input_scaled)[0] * 100, 2))
+    confidence = round(max(model.predict_proba(input_scaled)[0]) * 100, 2)
 
     if prediction == 0:
         st.success(f"Loan Approved - {confidence}% confidence")
