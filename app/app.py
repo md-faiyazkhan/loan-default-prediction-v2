@@ -15,7 +15,7 @@ scaler = joblib.load(os.path.join(BASE_DIR, "models", "scaler.pkl"))
 # UI
 st.title("Loan Approval Prediction")
 
-no_of_dependents = st.selectbox("Number of Dependents", [0, 1, 2, 3, 4, 5])
+no_of_dependents = st.selectbox("Number of Dependents", [0, 1, 2, 3, 4, 5], value=None, placeholder="Enter Number of dependents")
 education = st.selectbox("Education", ["Graduate", "Not Graduate"])
 self_employed = st.selectbox("Self Employed", ["No", "Yes"])
 income_annum = st.number_input("Annual Income (₹)", min_value=0, value=None, placeholder="Enter annual income")
