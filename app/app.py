@@ -18,14 +18,14 @@ st.title("Loan Approval Prediction")
 no_of_dependents = st.selectbox("Number of Dependents", [0, 1, 2, 3, 4, 5])
 education = st.selectbox("Education", ["Graduate", "Not Graduate"])
 self_employed = st.selectbox("Self Employed", ["No", "Yes"])
-income_annum = st.number_input("Annual Income (₹)", min_value=0)
-loan_amount = st.number_input("Loan Amount (₹)", min_value=0)
-loan_term = st.number_input("Loan Term (in years)", min_value=0, max_value=20)
+income_annum = st.number_input("Annual Income (₹)", min_value=0, value=None, placeholder="Enter annual income")
+loan_amount = st.number_input("Loan Amount (₹)", min_value=0, value=None, placeholder="Enter loan amount")
+loan_term = st.number_input("Loan Term (in years)", min_value=0, max_value=20, value=None, placeholder="Enter loan term")
 cibil_score = st.number_input("CIBIL Score", min_value=300, max_value=900)   
-residential_assets_value = st.number_input("Residential Assets Value (₹)", min_value=0)
-commercial_assets_value = st.number_input("Commercial Assets Value (₹)", min_value=0)
-luxury_assets_value = st.number_input("Luxury Assets Value (₹)", min_value=0)
-bank_asset_value = st.number_input("Bank Asset Value (₹)", min_value=0)
+residential_assets_value = st.number_input("Residential Assets Value (₹)", min_value=0, value=None, placeholder="Enter residential assets value")
+commercial_assets_value = st.number_input("Commercial Assets Value (₹)", min_value=0, value=None, placeholder="Enter commercial assets value")
+luxury_assets_value = st.number_input("Luxury Assets Value (₹)", min_value=0, value=None, placeholder="Enter luxury assets value")
+bank_asset_value = st.number_input("Bank Asset Value (₹)", min_value=0, value=None, placeholder="Enter bank assets value")
 
 # Encoding
 education = 0 if education == "Graduate" else 1
@@ -38,26 +38,29 @@ input_data = np.array([[
     luxury_assets_value, bank_asset_value
 ]])
 
-input_scaled = scaler.transform(input_data)
 
 # Prediction
 if st.button("Predict"):
-    prediction = model.predict(input_scaled)[0]
-    confidence = round(float(max(model.predict_proba(input_scaled)[0]) * 100), 2)
-
-    if prediction == 0:
-        st.success(f"Loan Approved - {confidence}% confidence")
+    if None in input_data[0]:
+        st.warning("Please fill all fields before predicting.")
     else:
-        st.error(f"Loan Rejected - {confidence}% confidence")
+        input_scaled = scaler.transform(input_data)
+        prediction = model.predict(input_scaled)[0]
+        confidence = round(float(max(model.predict_proba(input_scaled)[0]) * 100), 2)
 
-    # CIBIL Guidance
-    st.divider()
-    if cibil_score < 500: 
-        st.warning("Poor CIBIL Score - Low approval chances")
-    elif cibil_score < 700:
-        st.info("Average CIBIL Score - Moderate approval chances")
-    else: 
-        st.success("Good CIBIL Score - High approval chances")
+        if prediction == 0:
+            st.success(f"Loan Approved - {confidence}% confidence")
+        else:
+            st.error(f"Loan Rejected - {confidence}% confidence")
+
+        # CIBIL Guidance
+        st.divider()
+        if cibil_score < 500: 
+            st.warning("Poor CIBIL Score - Low approval chances")
+        elif cibil_score < 700:
+            st.info("Average CIBIL Score - Moderate approval chances")
+        else: 
+            st.success("Good CIBIL Score - High approval chances")
 
 
 # EMI Calculator
@@ -66,7 +69,7 @@ st.subheader("EMI Calculator")
 
 emi_rate = st.number_input("Annual Interest Rate (%)", min_value=0.0, max_value=30.0, value=8.5)
 
-if loan_amount > 0 and loan_term > 0 and emi_rate > 0:
+if loan_amount and loan_term and emi_rate and loan_amount > 0 and loan_term > 0 and emi_rate > 0:
     r = (emi_rate / 100) / 12          # monthly interest rate
     n = loan_term * 12                  # total months
     emi = loan_amount * r * (1 + r)**n / ((1 + r)**n - 1)
