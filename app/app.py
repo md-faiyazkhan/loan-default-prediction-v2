@@ -41,7 +41,7 @@ input_data = np.array([[
 
 # Prediction
 if st.button("Predict"):
-    if None in input_data[0] or cibil_score is None:
+    if None in input_data[0] or cibil_score is None or "Select" in [no_of_dependents, education, self_employed]:
         st.warning("Please fill all fields before predicting.")
     else:
         input_scaled = scaler.transform(input_data)
