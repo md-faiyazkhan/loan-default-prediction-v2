@@ -21,7 +21,7 @@ self_employed = st.selectbox("Self Employed", ["No", "Yes"])
 income_annum = st.number_input("Annual Income (₹)", min_value=0, value=None, placeholder="Enter annual income")
 loan_amount = st.number_input("Loan Amount (₹)", min_value=0, value=None, placeholder="Enter loan amount")
 loan_term = st.number_input("Loan Term (in years)", min_value=0, max_value=20, value=None, placeholder="Enter loan term")
-cibil_score = st.number_input("CIBIL Score", min_value=300, max_value=900)   
+cibil_score = st.number_input("CIBIL Score", min_value=300, max_value=900, value=None, placeholder="Enter CIBIL score (300-900)")   
 residential_assets_value = st.number_input("Residential Assets Value (₹)", min_value=0, value=None, placeholder="Enter residential assets value")
 commercial_assets_value = st.number_input("Commercial Assets Value (₹)", min_value=0, value=None, placeholder="Enter commercial assets value")
 luxury_assets_value = st.number_input("Luxury Assets Value (₹)", min_value=0, value=None, placeholder="Enter luxury assets value")
@@ -41,7 +41,7 @@ input_data = np.array([[
 
 # Prediction
 if st.button("Predict"):
-    if None in input_data[0]:
+    if None in input_data[0] or cibil_score is None:
         st.warning("Please fill all fields before predicting.")
     else:
         input_scaled = scaler.transform(input_data)
