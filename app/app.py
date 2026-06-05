@@ -62,6 +62,9 @@ if st.button("Predict"):
         else: 
             st.success("Good CIBIL Score - High approval chances")
 
+        st.divider()
+        st.caption("Note: This prediction is based on a machine learning model trained on historical loan data and should be used as a decision-support guide only, not as a final financial assessment.")
+
 
 # EMI Calculator
 st.divider()
