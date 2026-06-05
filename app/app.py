@@ -54,7 +54,6 @@ if st.button("Predict"):
             st.error(f"Loan Rejected - {confidence}% confidence")
 
         # CIBIL Guidance
-        # st.divider()
         if cibil_score < 500: 
             st.warning("Poor CIBIL Score - Low approval chances")
         elif cibil_score < 700:
