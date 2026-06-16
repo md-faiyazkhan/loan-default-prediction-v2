@@ -41,29 +41,35 @@ input_data = np.array([[
 
 # Prediction
 if st.button("Predict"):
-    if None in input_data[0] or cibil_score is None or "Select" in [no_of_dependents, education, self_employed]:
+    if None in input_data[0] or cibil_score is None:
         st.warning("Please fill all fields before predicting.")
     else:
         input_scaled = scaler.transform(input_data)
+
         prediction = model.predict(input_scaled)[0]
-        confidence = round(float(max(model.predict_proba(input_scaled)[0]) * 100), 2)
 
+        probabilities = model.predict_proba(input_scaled)[0]
+
+        # Assuming:
+        # 0 = Approved
+        # 1 = Rejected
+        approval_probability = round(float(probabilities[0] * 100), 2)
+
+        # Prediction Result
         if prediction == 0:
-            st.success(f"Loan Approved - {confidence}% confidence")
+            st.success("Loan Approved!")
+            st.success(f"Approval Probability: {approval_probability}%")
         else:
-            st.error(f"Loan Rejected - {confidence}% confidence")
-
-        # CIBIL Guidance
-        if cibil_score < 500: 
-            st.warning("Poor CIBIL Score - Low approval chances")
-        elif cibil_score < 700:
-            st.info("Average CIBIL Score - Moderate approval chances")
-        else: 
-            st.success("Good CIBIL Score - High approval chances")
+            st.error("Loan Rejected!")
+            st.error(f"Approval Probability: {approval_probability}%")
 
         # Disclaimer
         st.divider()
-        st.caption("Note: This prediction is based on a machine learning model trained on historical loan data and should be used as a decision-support guide only, not as a final financial assessment.")
+        st.caption(
+            "Note: This prediction is based on a machine learning model "
+            "trained on historical loan data and should be used as a "
+            "decision-support guide only, not as a final financial assessment."
+        )
 
 
 # EMI Calculator
