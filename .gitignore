@@ -1,6 +1,8 @@
-# Data
-data/raw/
-info/
+# Data files
+data/raw/*
+!data/raw/.gitkeep
+
+# VS code
 .vscode
 
 # Jupyter
@@ -19,3 +21,5 @@ ml-env/
 .DS_Store
 Thumbs.db
 
+# Info folder
+info/
