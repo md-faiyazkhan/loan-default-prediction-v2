@@ -261,7 +261,7 @@ numpy
 scikit-learn
 matplotlib
 seaborn
-xgboost
+xgboost==2.1.4
 joblib
 streamlit
 ```
@@ -281,8 +281,19 @@ streamlit
 
 ---
 
-## Author
+## ⚠️ Disclaimer
+
+This project is built for educational and portfolio purposes only. The model is trained
+on a publicly available Kaggle dataset and should not be used to make real financial or
+lending decisions. As discussed in the "Dataset Quality" section above, this model has
+known limitations — including heavy reliance on a small subset of features — that make
+it unsuitable for production use without further validation on diverse, real-world data.
+
+---
+
+## 👤 Author
 
 **Md Faiyaz Khan**
-Self-taught ML Engineer | AI & ML Certified — Intellipaat x IIT Patna
-[LinkedIn](https://linkedin.com/in/mdfaiyazkhan) | [GitHub](https://github.com/md-faiyazkhan)
+- GitHub: [@md-faiyazkhan](https://github.com/md-faiyazkhan)
+- LinkedIn: [@mdfaiyazkhan](https://www.linkedin.com/in/mdfaiyazkhan)
+- Email: faiyazkhan.work@gmail.com
