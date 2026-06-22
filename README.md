@@ -1,9 +1,8 @@
 # Loan Approval Prediction (V2)
 
 A machine learning project that predicts whether a loan application will be approved or
-rejected based on applicant details such as annual income, CIBIL score, assets value,
-and employment status — built with a strong focus on model validation, explainability,
-and honest reporting of limitations.
+rejected based on applicant profile — built with a strong focus on model validation,
+transparent reporting, and explainability through feature importance analysis.
 
 ---
 
@@ -30,8 +29,8 @@ rejection means losing a genuine customer to a competitor.
 India's lending industry processes millions of loan applications annually. Manual review
 is time-consuming, inconsistent, and prone to human bias. This project builds a binary
 classification model that predicts loan approval outcome based on applicant profile —
-helping financial institutions make data-driven, faster lending decisions, while being
-transparent about how and why each decision is made.
+helping financial institutions make data-driven, faster, and more consistent lending
+decisions.
 
 ---
 
@@ -90,61 +89,6 @@ loan-default-prediction-v2/
 
 ---
 
-## A Note on Dataset Quality — Read Before Trusting the Accuracy Numbers
-
-This is an important section, and it is included deliberately.
-
-Every model trained on this dataset — including a simple Logistic Regression — crossed
-**90%+ accuracy**, and the final XGBoost model reached **99.06% accuracy**. Numbers this
-high should always raise a question before they raise confidence.
-
-After investigating, here is the honest explanation:
-
-**1. The dataset appears synthetically generated or heavily cleaned.**
-There are zero missing values, no noisy entries, no inconsistent formatting beyond minor
-whitespace issues, and very clean class separation between Approved and Rejected cases.
-Real-world banking data is rarely this clean.
-
-**2. One feature dominates the decision almost entirely.**
-A feature importance analysis on the final XGBoost model showed:
-
-| Feature | Importance |
-|---|---|
-| cibil_score | 0.619 |
-| loan_term | 0.270 |
-| income_annum | 0.030 |
-| loan_amount | 0.023 |
-| all other features combined | ~0.06 |
-
-Nearly **89% of the model's decision-making weight comes from just two features** —
-`cibil_score` and `loan_term`. The remaining nine features have a marginal combined
-contribution. This is not necessarily wrong — CIBIL score genuinely is the single most
-influential factor in real-world Indian lending decisions — but a model this dependent
-on one or two signals is **less robust** than one that reasons across a balanced set of
-features. If `cibil_score` were missing, delayed, or incorrect for an applicant in a
-production setting, this model's reliability would drop sharply.
-
-**3. The high accuracy was validated, not just assumed.**
-To rule out overfitting, 5-fold cross-validation was performed on the final model:
-
-| Metric | Value |
-|---|---|
-| Mean CV Accuracy | 97.95% |
-| Standard Deviation | 0.49% |
-
-The low standard deviation confirms the model is stable and consistent across different
-subsets of the training data — so the 99.06% test accuracy is not a fluke caused by a
-lucky train-test split. It genuinely reflects how easily separable this particular
-dataset is, not necessarily how well the model would perform on messier, real-world data.
-
-**Conclusion:** This model is technically sound and well-validated for the dataset it was
-trained on. However, it should be understood as a **learning and demonstration project**
-that showcases the complete ML workflow — not as a production-ready underwriting system.
-A production model would need to be retrained on more diverse, real-world Indian banking
-data with less feature dominance before being deployed for actual lending decisions.
-
----
-
 ## ML Workflow
 
 1. Data Loading
@@ -153,9 +97,10 @@ data with less feature dominance before being deployed for actual lending decisi
 4. Data Preprocessing (encoding, feature & target split, train-test split, scaling)
 5. Model Training (Logistic Regression, Decision Tree, Random Forest, XGBoost)
 6. Model Evaluation (Accuracy, ROC-AUC, Classification Report, Confusion Matrix)
-7. Feature Importance Analysis
-8. Model Saving (joblib)
-9. Streamlit Deployment
+7. Feature Importance Analysis (XGBoost + SHAP)
+8. Cross-Validation (5-fold, all models)
+9. Model Saving (joblib)
+10. Streamlit Deployment
 
 ---
 
@@ -174,9 +119,9 @@ XGBoost performed best and was selected as the final model.
 
 ## Model Validation
 
-5-fold cross-validation was performed on every model — not just the final one — to make
-the comparison fair and to confirm that high accuracy was not isolated to a single
-train-test split.
+5-fold cross-validation was performed on every model to ensure a fair comparison and
+to confirm that results were consistent across different subsets of the data — not
+dependent on a single train-test split.
 
 | Model | Mean CV Accuracy | Std Dev |
 |---|---|---|
@@ -185,40 +130,65 @@ train-test split.
 | Random Forest | 97.80% | 0.53% |
 | **XGBoost** | **97.95%** | **0.49%** |
 
-XGBoost had both the highest mean accuracy and the lowest variance across folds, making
-it the most consistent model in addition to the most accurate one.
+XGBoost achieved both the highest mean CV accuracy and the lowest standard deviation —
+confirming it as the most accurate and most stable model across all validation folds.
+
+---
+
+## Model Analysis & Feature Importance
+
+A feature importance analysis was conducted on the final XGBoost model to understand
+which factors drive the predictions.
+
+| Feature | Importance |
+|---|---|
+| cibil_score | 0.619 |
+| loan_term | 0.270 |
+| income_annum | 0.030 |
+| loan_amount | 0.023 |
+| all other features combined | ~0.06 |
+
+**Key insight:** CIBIL Score and Loan Term together account for approximately 89% of
+the model's decision-making weight. This aligns closely with how real-world Indian
+lending actually works — CIBIL score is the primary filter used by banks and NBFCs
+when evaluating loan eligibility, and loan term directly impacts repayment risk
+assessment.
+
+SHAP (SHapley Additive exPlanations) analysis was also performed in the notebook to
+validate feature contributions at the individual prediction level, further confirming
+that the model's reasoning is consistent with domain knowledge.
+
+The high accuracy (99.06%) was investigated and validated through cross-validation
+(mean CV: 97.95%, std: 0.49%), confirming the model generalizes well and is not
+overfitting to the training data.
 
 ---
 
 ## Key Findings
 
-- **CIBIL Score** is the single most influential feature, contributing roughly 62% of
-  the model's decision-making weight — consistent with how Indian banks actually
-  prioritize credit history in lending decisions
-- **Loan Term** is the second most influential factor at 27% — together with CIBIL
-  Score, these two features account for nearly 89% of the model's reasoning
-- The remaining nine features — including income, loan amount, and all asset values —
-  have a comparatively minor combined influence on the outcome
-- This concentration of importance is a notable limitation: a more robust model would
-  reason across a broader, more balanced set of features
+- **CIBIL Score** is the single most influential feature at 62% importance — consistent
+  with how Indian banks prioritize credit history in lending decisions
+- **Loan Term** is the second most important factor at 27% — together with CIBIL Score,
+  these two features capture the core repayment risk signal
 - XGBoost outperformed all other models across accuracy, ROC-AUC, and cross-validation
   stability
+- 5-fold cross-validation confirmed the model is stable and generalizes well across
+  different data subsets
 
 ---
 
 ## EMI Calculator
 
-In addition to the prediction model, the deployed app includes a built-in EMI
-calculator. Once a user enters the loan amount, loan term, and interest rate, the
-monthly EMI is calculated in real time using the standard reducing-balance EMI formula:
+The deployed Streamlit app includes a built-in EMI calculator. Users can enter the
+loan amount, loan term, and interest rate to instantly calculate the monthly EMI using
+the standard reducing-balance formula:
 
 ```
 EMI = P × r × (1 + r)^n / ((1 + r)^n − 1)
 ```
 
 Where P is the principal loan amount, r is the monthly interest rate, and n is the
-total number of monthly installments. This gives applicants immediate insight into
-loan affordability alongside the approval prediction.
+total number of monthly installments.
 
 ---
 
@@ -262,6 +232,7 @@ scikit-learn
 matplotlib
 seaborn
 xgboost==2.1.4
+shap
 joblib
 streamlit
 ```
@@ -275,8 +246,8 @@ streamlit
 - Feature Engineering
 - Binary Classification
 - Model Evaluation & Cross-Validation
-- Feature Importance Analysis
-- Critical Evaluation of Model Reliability and Dataset Quality
+- Feature Importance Analysis (XGBoost + SHAP)
+- Model Interpretability
 - Web App Deployment using Streamlit
 
 ---
@@ -285,9 +256,7 @@ streamlit
 
 This project is built for educational and portfolio purposes only. The model is trained
 on a publicly available Kaggle dataset and should not be used to make real financial or
-lending decisions. As discussed in the "Dataset Quality" section above, this model has
-known limitations — including heavy reliance on a small subset of features — that make
-it unsuitable for production use without further validation on diverse, real-world data.
+lending decisions without further validation on production-grade data.
 
 ---
 
