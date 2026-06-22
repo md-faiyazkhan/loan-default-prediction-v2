@@ -1,7 +1,9 @@
 import streamlit as st
 import numpy as np
+import pandas as pd
 import joblib
 import os
+from explainability import get_explanation, explain_in_words, generate_recommendations
 
 # Page Configuration 
 st.set_page_config(page_title="Loan Approval Prediction", page_icon="🏦")
@@ -11,6 +13,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 model = joblib.load(os.path.join(BASE_DIR, "models", "loan_default_model.pkl"))
 scaler = joblib.load(os.path.join(BASE_DIR, "models", "scaler.pkl"))
+
+feature_cols = ['no_of_dependents', 'education', 'self_employed', 'income_annum',
+                 'loan_amount', 'loan_term', 'cibil_score', 'residential_assets_value',
+                 'commercial_assets_value', 'luxury_assets_value', 'bank_asset_value']
 
 # UI
 st.title("Loan Approval Prediction")
@@ -62,6 +68,27 @@ if st.button("Predict"):
         else:
             st.error("Loan Rejected!")
             st.error(f"Approval Probability: {approval_probability}%")
+
+        # Explainability Section
+        st.divider()
+        st.subheader("Why this decision?")
+
+        input_df = pd.DataFrame(input_scaled, columns=feature_cols)
+        positive, negative = get_explanation(model, input_df, feature_cols)
+        pos_text, neg_text = explain_in_words(positive, negative)
+
+        for t in pos_text:
+            st.write("✅", t)
+        for t in neg_text:
+            st.write("❌", t)
+
+        # Recommendations Section
+        if negative:
+            st.divider()
+            st.subheader("Suggestions to improve approval chances")
+            recommendations = generate_recommendations(negative)
+            for r in recommendations:
+                st.write("💡", r)
 
         # Disclaimer
         st.divider()
